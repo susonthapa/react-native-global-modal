@@ -65,6 +65,34 @@ function App(): JSX.Element {
             )
           }), 3000)
         }} />
+        <Button title='Nested Modal' onPress={() => {
+          showGlobalModal({
+            Component: () => (
+              <View>
+                <Text>This is a Simple Modal</Text>
+                <Button title='Open Another Modal' onPress={() => {
+                  showGlobalModal({
+                    Component: () => (
+                      <View style={{
+                        backgroundColor: 'pink',
+                        padding: 36,
+                      }}>
+                        <Text>This is a Complex Modal</Text>
+                        <Text>This is supposed to another Modal</Text>
+                        <View style={{
+                          height: 100,
+                          width: 100,
+                          backgroundColor: 'red',
+                        }} />
+                        <Text>Another Dialog Text</Text>
+                      </View>
+                    )
+                  })
+                }} />
+              </View>
+            )
+          })
+        }} />
       </View>
       <GlobalModal />
     </SafeAreaView>
