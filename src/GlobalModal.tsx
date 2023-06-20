@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { DeviceEventEmitter, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { DeviceEventEmitter, Pressable, Modal, StyleSheet, Text, View } from 'react-native';
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 const SHOW_GLOBAL_MODAL = 'show_global_modal';
 
@@ -13,7 +14,13 @@ export function showGlobalModal(prop: GlobalModalProps) {
 }
 
 function GlobalModal() {
+  const opacityValue = useSharedValue(0)
+  const opacityStyle = useAnimatedStyle(() => {
+    return { opacity: opacityValue.value }
+  })
+
   const [modalProps, setModalProps] = useState<GlobalModalProps[]>([]);
+  const [modalVisible, setModalVisible] = useState(false)
 
   useEffect(() => {
     const sub = DeviceEventEmitter.addListener(
@@ -31,18 +38,49 @@ function GlobalModal() {
   }, []);
 
   const activeModalProp = modalProps.slice(-1)[0]
+  const isVisible = activeModalProp !== undefined
 
   const closeModal = () => {
     setModalProps((props) => props.slice(0, -1));
   }
 
+  const hideModal = () => {
+    setModalVisible(false)
+  }
+
+  useEffect(() => {
+    if (isVisible) {
+      setModalVisible(true)
+      opacityValue.value = withTiming(0.5, {
+        duration: 300,
+        easing: Easing.ease,
+      })
+    } else {
+      opacityValue.value = withTiming(0.0, {
+        duration: 300,
+        easing: Easing.linear,
+      }, (finished, current) => {
+        console.log(`TODO: `, finished, current);
+        
+        if (finished) {
+          runOnJS(hideModal)()
+        }
+      })
+
+    }
+  }, [isVisible])
+
+  console.log(`TODO: visible`, modalVisible);
+  
+
   return (
     <Modal
-      animationType='fade'
-      visible={activeModalProp !== undefined}
-      onRequestClose={closeModal}
+      animationType='none'
       transparent
+      visible={modalVisible}
+      onRequestClose={closeModal}
     >
+      <Animated.View style={[styles.backdrop, opacityStyle]}></Animated.View>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           {activeModalProp?.Component && <activeModalProp.Component />}
@@ -58,12 +96,20 @@ function GlobalModal() {
 }
 
 const styles = StyleSheet.create({
+  backdrop: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    opacity: 0,
+    backgroundColor: 'black',
+  },
   centeredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 22,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   modalView: {
     margin: 20,
