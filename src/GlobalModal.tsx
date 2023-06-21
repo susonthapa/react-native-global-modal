@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { DeviceEventEmitter, Pressable, Modal, StyleSheet, Text, View } from 'react-native';
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, interpolate, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 const SHOW_GLOBAL_MODAL = 'show_global_modal';
 
@@ -15,7 +15,10 @@ export function showGlobalModal(prop: GlobalModalProps) {
 
 function GlobalModal() {
   const opacityValue = useSharedValue(0)
-  const opacityStyle = useAnimatedStyle(() => {
+  const backdropOpacityStyle = useAnimatedStyle(() => {
+    return { opacity: interpolate(opacityValue.value, [0, 1], [0, 0.5]) }
+  })
+  const containerOpacityStyle = useAnimatedStyle(() => {
     return { opacity: opacityValue.value }
   })
 
@@ -51,17 +54,15 @@ function GlobalModal() {
   useEffect(() => {
     if (isVisible) {
       setModalVisible(true)
-      opacityValue.value = withTiming(0.5, {
+      opacityValue.value = withTiming(1, {
         duration: 300,
         easing: Easing.ease,
       })
     } else {
-      opacityValue.value = withTiming(0.0, {
+      opacityValue.value = withTiming(0, {
         duration: 300,
         easing: Easing.linear,
-      }, (finished, current) => {
-        console.log(`TODO: `, finished, current);
-        
+      }, (finished) => {
         if (finished) {
           runOnJS(hideModal)()
         }
@@ -70,9 +71,6 @@ function GlobalModal() {
     }
   }, [isVisible])
 
-  console.log(`TODO: visible`, modalVisible);
-  
-
   return (
     <Modal
       animationType='none'
@@ -80,8 +78,8 @@ function GlobalModal() {
       visible={modalVisible}
       onRequestClose={closeModal}
     >
-      <Animated.View style={[styles.backdrop, opacityStyle]}></Animated.View>
-      <View style={styles.centeredView}>
+      <Animated.View style={[styles.backdrop, backdropOpacityStyle]}></Animated.View>
+      <Animated.View needsOffscreenAlphaCompositing style={[styles.centeredView, containerOpacityStyle]}>
         <View style={styles.modalView}>
           {activeModalProp?.Component && <activeModalProp.Component />}
           <Pressable
@@ -90,7 +88,7 @@ function GlobalModal() {
             <Text style={styles.textStyle}>Hide Modal</Text>
           </Pressable>
         </View>
-      </View>
+      </Animated.View>
     </Modal>
   );
 }
