@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { DeviceEventEmitter, Pressable, Modal, StyleSheet, Text, View } from 'react-native';
-import Animated, { Easing, interpolate, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, interpolate, Layout, BounceIn, SequencedTransition, FadingTransition, runOnJS, useAnimatedStyle, useSharedValue, withTiming, FadeIn, FadeOut } from 'react-native-reanimated';
 
 const SHOW_GLOBAL_MODAL = 'show_global_modal';
 
 export type GlobalModalProps = {
   skipQueue?: boolean;
+  modalKey?: string,
   Component: React.FC
 };
 
@@ -31,7 +32,7 @@ function GlobalModal() {
       (prop: GlobalModalProps) => {
         setModalProps((props) => [
           ...props.filter((it) => !it.skipQueue),
-          prop,
+          { ...prop, modalKey: prop.modalKey ?? Date.now().toString() },
         ]);
       }
     );
@@ -79,15 +80,19 @@ function GlobalModal() {
       onRequestClose={closeModal}
     >
       <Animated.View style={[styles.backdrop, backdropOpacityStyle]}></Animated.View>
-      <Animated.View needsOffscreenAlphaCompositing style={[styles.centeredView, containerOpacityStyle]}>
-        <View style={styles.modalView}>
-          {activeModalProp?.Component && <activeModalProp.Component />}
+      <Animated.View style={[styles.centeredView, containerOpacityStyle]}>
+        <Animated.View needsOffscreenAlphaCompositing style={styles.modalView} layout={Layout.duration(300)}>
+          {activeModalProp?.Component && (
+            <Animated.View key={activeModalProp?.modalKey} exiting={FadeOut} entering={FadeIn.delay(300).duration(250)}>
+              <activeModalProp.Component />
+            </Animated.View>
+          )}
           <Pressable
             style={[styles.button, styles.buttonClose]}
             onPress={closeModal}>
             <Text style={styles.textStyle}>Hide Modal</Text>
           </Pressable>
-        </View>
+        </Animated.View>
       </Animated.View>
     </Modal>
   );
@@ -115,14 +120,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
   },
   button: {
     borderRadius: 20,
