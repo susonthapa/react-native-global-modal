@@ -19,6 +19,7 @@ import {
 import Confirmation from './Modal/Examples/Confirmation';
 import LongContent from './Modal/Examples/LongContent';
 import Progress from './Modal/Examples/Progress';
+import ScrollingContent from './Modal/Examples/ScrollingContent';
 import GlobalModal, { hideGlobalModal, showGlobalModal } from './Modal/GlobalModal';
 
 function App(): JSX.Element {
@@ -104,6 +105,9 @@ function App(): JSX.Element {
         })} />
         <Button title='Long Content Modal' onPress={() => showGlobalModal({
           Component: () => <LongContent />,
+        })} />
+        <Button title='Scrolling Content Modal' onPress={() => showGlobalModal({
+          Component: () => <ScrollingContent />,
         })} />
       </View>
       <GlobalModal />
