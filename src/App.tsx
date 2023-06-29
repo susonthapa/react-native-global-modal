@@ -16,8 +16,10 @@ import {
 import {
   Colors
 } from 'react-native/Libraries/NewAppScreen';
+import AutomaticModal from './Modal/Examples/AutomaticModal';
 import Confirmation from './Modal/Examples/Confirmation';
 import LongContent from './Modal/Examples/LongContent';
+import NestedModal from './Modal/Examples/NestModal';
 import Progress from './Modal/Examples/Progress';
 import ScrollingContent from './Modal/Examples/ScrollingContent';
 import GlobalModal, { hideGlobalModal, showGlobalModal } from './Modal/GlobalModal';
@@ -35,66 +37,22 @@ function App(): JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <View>
-        <Text>Global Dialog Test</Text>
-        <Button title='Open 3 Dialogs' onPress={() => {
+      <View style={{
+        alignItems: 'center'
+      }}>
+        <Text style={{
+          fontSize: 32,
+          color: 'gray',
+          fontWeight: 'bold',
+        }}>Global Dialog Test</Text>
+        <Button title='Open 3 Modals' onPress={() => {
           showGlobalModal({
-            Component: () => (
-              <View style={{
-                backgroundColor: 'gray',
-                padding: 36,
-              }}>
-                <Text>This is the First Dialog</Text>
-              </View>
-            )
+            Component: AutomaticModal
           })
-          setTimeout(() => showGlobalModal({
-            Component: () => (
-              <View style={{
-                backgroundColor: 'pink',
-                padding: 36,
-              }}>
-                <Text>This is the Second Dialog</Text>
-              </View>
-            )
-          }), 1000)
-          setTimeout(() => showGlobalModal({
-            Component: () => (
-              <View style={{
-                backgroundColor: 'yellow',
-                padding: 36,
-              }}>
-                <Text>This is the Third Dialog</Text>
-              </View>
-            )
-          }), 3000)
         }} />
         <Button title='Nested Modal' onPress={() => {
           showGlobalModal({
-            Component: () => (
-              <View>
-                <Text>This is a Simple Modal</Text>
-                <Button title='Open Another Modal' onPress={() => {
-                  showGlobalModal({
-                    Component: () => (
-                      <View style={{
-                        backgroundColor: 'pink',
-                        padding: 36,
-                      }}>
-                        <Text>This is a Complex Modal</Text>
-                        <Text>This is supposed to be another Modal</Text>
-                        <View style={{
-                          height: 100,
-                          width: 100,
-                          backgroundColor: 'red',
-                        }} />
-                        <Text>Another Dialog Text</Text>
-                      </View>
-                    )
-                  })
-                }} />
-              </View>
-            )
+            Component: NestedModal
           })
         }} />
         <Button title='Progress Modal' onPress={() => showGlobalModal({ Component: Progress })} />
