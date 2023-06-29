@@ -93,7 +93,7 @@ function GlobalModal() {
       <Animated.View style={[styles.centeredView, containerOpacityStyle]}>
         <Animated.View style={styles.modalView} layout={Layout.delay(150).duration(250)}>
           {activeModalProp?.Component && (
-            <Animated.View key={activeModalProp?.modalKey} exiting={FadeOut.duration(150)} entering={FadeIn.delay(400).duration(250)}>
+            <Animated.View key={activeModalProp?.modalKey} exiting={FadeOut.duration(150)} entering={FadeIn.delay(modalProps.length === 1 ? 0 : 400).duration(250)}>
               <activeModalProp.Component />
               {!activeModalProp?.hideClose && <Pressable
                 style={[styles.button, styles.buttonClose]}
