@@ -16,7 +16,8 @@ import {
 import {
   Colors
 } from 'react-native/Libraries/NewAppScreen';
-import GlobalModal, { showGlobalModal } from './GlobalModal';
+import ProgressContent from './Modal/Examples/ProgressContent';
+import GlobalModal, { showGlobalModal } from './Modal/GlobalModal';
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -93,6 +94,7 @@ function App(): JSX.Element {
             )
           })
         }} />
+        <Button title='Progress Content' onPress={() => showGlobalModal({ Component: ProgressContent })} />
       </View>
       <GlobalModal />
     </SafeAreaView>
