@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Modal, Pressable, StyleSheet, Text } from 'react-native';
 import Animated, { Easing, FadeIn, FadeOut, interpolate, Layout, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
@@ -31,19 +31,29 @@ function GlobalModal() {
 
   const [modalProps, setModalProps] = useState<GlobalModalProps[]>([]);
   const [modalVisible, setModalVisible] = useState(false)
+  const lastModalRef = useRef<GlobalModalProps>()
+  const isFirstModalRef = useRef<boolean>()
 
   useEffect(() => {
     const showSub = DeviceEventEmitter.addListener(
       SHOW_GLOBAL_MODAL,
       (prop: GlobalModalProps) => {
-        setModalProps((props) => [
-          ...props.filter((it) => !it.skipQueue),
-          { ...prop, modalKey: prop.modalKey ?? Date.now().toString() },
-        ]);
+        setModalProps((oldProps) => {
+          isFirstModalRef.current = oldProps.length === 0
+          return [
+            ...oldProps.filter((it) => !it.skipQueue),
+            { ...prop, modalKey: prop.modalKey ?? Date.now().toString() },
+          ]
+        });
       }
     );
     const hideSub = DeviceEventEmitter.addListener(HIDE_GLOBAL_MODAL, (key: string) => {
-      setModalProps((oldProps) => oldProps.filter((it) => it.modalKey !== key))
+      setModalProps((oldProps) => {
+        if (oldProps.length === 1) {
+          lastModalRef.current = oldProps[0]
+        }
+        return oldProps.filter((it) => it.modalKey !== key)
+      })
     })
     return () => {
       showSub.remove();
@@ -51,22 +61,28 @@ function GlobalModal() {
     };
   }, []);
 
-  const activeModalProp = modalProps.slice(-1)[0]
-  const isVisible = activeModalProp !== undefined
+  const activeModalProp = modalProps.slice(-1)[0] ?? lastModalRef.current
+  const isVisible = modalProps.length !== 0
 
   const closeModal = () => {
-    setModalProps((props) => props.slice(0, -1));
+    setModalProps((oldProps) => {
+      if (oldProps.length === 1) {
+        lastModalRef.current = oldProps[0]
+      }
+      return oldProps.slice(0, -1)
+    });
   }
 
   const hideModal = () => {
     setModalVisible(false)
+    lastModalRef.current = undefined
   }
 
   useEffect(() => {
     if (isVisible) {
       setModalVisible(true)
       opacityValue.value = withTiming(1, {
-        duration: 300,
+        duration: 250,
         easing: Easing.ease,
       })
     } else {
@@ -93,7 +109,7 @@ function GlobalModal() {
       <Animated.View style={[styles.centeredView, containerOpacityStyle]}>
         <Animated.View style={styles.modalView} layout={Layout.delay(150).duration(250)}>
           {activeModalProp?.Component && (
-            <Animated.View key={activeModalProp?.modalKey} exiting={FadeOut.duration(150)} entering={FadeIn.delay(modalProps.length === 1 ? 0 : 400).duration(250)}>
+            <Animated.View key={activeModalProp?.modalKey} exiting={FadeOut.duration(150)} entering={isFirstModalRef.current ? undefined : FadeIn.delay(400).duration(250)}>
               <activeModalProp.Component />
               {!activeModalProp?.hideClose && <Pressable
                 style={[styles.button, styles.buttonClose]}
