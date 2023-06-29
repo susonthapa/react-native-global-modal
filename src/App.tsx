@@ -17,6 +17,7 @@ import {
   Colors
 } from 'react-native/Libraries/NewAppScreen';
 import Confirmation from './Modal/Examples/Confirmation';
+import LongContent from './Modal/Examples/LongContent';
 import Progress from './Modal/Examples/Progress';
 import GlobalModal, { hideGlobalModal, showGlobalModal } from './Modal/GlobalModal';
 
@@ -100,6 +101,9 @@ function App(): JSX.Element {
           modalKey: 'confirmation-modal',
           Component: () => <Confirmation onCancelPress={() => hideGlobalModal('confirmation-modal')} onYesPress={() => hideGlobalModal('confirmation-modal')} />,
           hideClose: true
+        })} />
+        <Button title='Long Content Modal' onPress={() => showGlobalModal({
+          Component: () => <LongContent />,
         })} />
       </View>
       <GlobalModal />
