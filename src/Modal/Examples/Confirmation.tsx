@@ -1,7 +1,12 @@
 import React from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
-const Confirmation = () => {
+type Props = {
+  onCancelPress: () => void,
+  onYesPress: () => void,
+}
+
+const Confirmation = (props: Props) => {
   return (
     <View>
       <Text style={{
@@ -17,14 +22,14 @@ const Confirmation = () => {
           flex: 1,
           backgroundColor: '#FF5252',
           ...styles.button
-        }} onPress={() => { }}>
+        }} onPress={props.onCancelPress}>
           <Text style={styles.buttonText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity style={{
           flex: 1,
           backgroundColor: '#7C4DFF',
           ...styles.button,
-        }} onPress={() => { }}>
+        }} onPress={props.onYesPress}>
           <Text style={styles.buttonText}>Yes</Text>
         </TouchableOpacity>
       </View>
