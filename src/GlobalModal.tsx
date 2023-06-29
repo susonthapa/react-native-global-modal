@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { DeviceEventEmitter, Pressable, Modal, StyleSheet, Text, View } from 'react-native';
-import Animated, { Easing, interpolate, Layout, BounceIn, SequencedTransition, FadingTransition, runOnJS, useAnimatedStyle, useSharedValue, withTiming, FadeIn, FadeOut } from 'react-native-reanimated';
+import { DeviceEventEmitter, Modal, Pressable, StyleSheet, Text } from 'react-native';
+import Animated, { Easing, FadeIn, FadeOut, interpolate, Layout, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
 const SHOW_GLOBAL_MODAL = 'show_global_modal';
+const HIDE_GLOBAL_MODAL = "hide_global_modal"
 
 export type GlobalModalProps = {
   skipQueue?: boolean;
@@ -12,6 +13,10 @@ export type GlobalModalProps = {
 
 export function showGlobalModal(prop: GlobalModalProps) {
   DeviceEventEmitter.emit(SHOW_GLOBAL_MODAL, prop);
+}
+
+export function hideGlobalModal(key: string) {
+  DeviceEventEmitter.emit(HIDE_GLOBAL_MODAL, key)
 }
 
 function GlobalModal() {
@@ -27,7 +32,7 @@ function GlobalModal() {
   const [modalVisible, setModalVisible] = useState(false)
 
   useEffect(() => {
-    const sub = DeviceEventEmitter.addListener(
+    const showSub = DeviceEventEmitter.addListener(
       SHOW_GLOBAL_MODAL,
       (prop: GlobalModalProps) => {
         setModalProps((props) => [
@@ -36,8 +41,12 @@ function GlobalModal() {
         ]);
       }
     );
+    const hideSub = DeviceEventEmitter.addListener(HIDE_GLOBAL_MODAL, (key: string) => {
+      setModalProps((oldProps) => oldProps.filter((it) => it.modalKey !== key))
+    })
     return () => {
-      sub.remove();
+      showSub.remove();
+      hideSub.remove()
     };
   }, []);
 
@@ -81,17 +90,17 @@ function GlobalModal() {
     >
       <Animated.View style={[styles.backdrop, backdropOpacityStyle]}></Animated.View>
       <Animated.View style={[styles.centeredView, containerOpacityStyle]}>
-        <Animated.View needsOffscreenAlphaCompositing style={styles.modalView} layout={Layout.duration(300)}>
+        <Animated.View style={styles.modalView} layout={Layout.delay(150).duration(250)}>
           {activeModalProp?.Component && (
-            <Animated.View key={activeModalProp?.modalKey} exiting={FadeOut} entering={FadeIn.delay(300).duration(250)}>
+            <Animated.View key={activeModalProp?.modalKey} exiting={FadeOut.duration(150)} entering={FadeIn.delay(400).duration(250)}>
               <activeModalProp.Component />
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={closeModal}>
+                <Text style={styles.textStyle}>Hide Modal</Text>
+              </Pressable>
             </Animated.View>
           )}
-          <Pressable
-            style={[styles.button, styles.buttonClose]}
-            onPress={closeModal}>
-            <Text style={styles.textStyle}>Hide Modal</Text>
-          </Pressable>
         </Animated.View>
       </Animated.View>
     </Modal>

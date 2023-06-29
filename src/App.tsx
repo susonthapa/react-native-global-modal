@@ -78,7 +78,7 @@ function App(): JSX.Element {
                         padding: 36,
                       }}>
                         <Text>This is a Complex Modal</Text>
-                        <Text>This is supposed to another Modal</Text>
+                        <Text>This is supposed to be another Modal</Text>
                         <View style={{
                           height: 100,
                           width: 100,
