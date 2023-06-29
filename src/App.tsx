@@ -16,7 +16,8 @@ import {
 import {
   Colors
 } from 'react-native/Libraries/NewAppScreen';
-import ProgressContent from './Modal/Examples/ProgressContent';
+import Confirmation from './Modal/Examples/Confirmation';
+import Progress from './Modal/Examples/Progress';
 import GlobalModal, { showGlobalModal } from './Modal/GlobalModal';
 
 function App(): JSX.Element {
@@ -94,7 +95,8 @@ function App(): JSX.Element {
             )
           })
         }} />
-        <Button title='Progress Content' onPress={() => showGlobalModal({ Component: ProgressContent })} />
+        <Button title='Progress Modal' onPress={() => showGlobalModal({ Component: Progress })} />
+        <Button title='Confirmation Modal' onPress={() => showGlobalModal({ Component: Confirmation, hideClose: true })} />
       </View>
       <GlobalModal />
     </SafeAreaView>

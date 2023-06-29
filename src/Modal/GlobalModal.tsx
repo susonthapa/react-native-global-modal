@@ -8,6 +8,7 @@ const HIDE_GLOBAL_MODAL = "hide_global_modal"
 export type GlobalModalProps = {
   skipQueue?: boolean;
   modalKey?: string,
+  hideClose?: boolean,
   Component: React.FC
 };
 
@@ -94,11 +95,12 @@ function GlobalModal() {
           {activeModalProp?.Component && (
             <Animated.View key={activeModalProp?.modalKey} exiting={FadeOut.duration(150)} entering={FadeIn.delay(400).duration(250)}>
               <activeModalProp.Component />
-              <Pressable
+              {!activeModalProp?.hideClose && <Pressable
                 style={[styles.button, styles.buttonClose]}
                 onPress={closeModal}>
-                <Text style={styles.textStyle}>Hide Modal</Text>
+                <Text style={styles.textStyle}>Close Modal</Text>
               </Pressable>
+              }
             </Animated.View>
           )}
         </Animated.View>
@@ -131,9 +133,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   button: {
-    borderRadius: 20,
+    borderRadius: 4,
     padding: 10,
     elevation: 2,
+    marginTop: 16,
   },
   buttonOpen: {
     backgroundColor: '#F194FF',

@@ -1,7 +1,7 @@
 import React from "react"
 import { ActivityIndicator, Text, View } from "react-native"
 
-const ProgressContent = () => {
+const Progress = () => {
   return (
     <View style={{
       justifyContent: 'center',
@@ -20,4 +20,4 @@ const ProgressContent = () => {
   )
 }
 
-export default ProgressContent
+export default Progress
