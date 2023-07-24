@@ -31,7 +31,7 @@ function GlobalModal() {
 
   const [modalProps, setModalProps] = useState<GlobalModalProps[]>([]);
   const [modalVisible, setModalVisible] = useState(false)
-  const lastModalRef = useRef<GlobalModalProps>()
+  const [isVisible, setIsVisible] = useState(false)
   const isFirstModalRef = useRef<boolean>()
 
   useEffect(() => {
@@ -40,6 +40,7 @@ function GlobalModal() {
       (prop: GlobalModalProps) => {
         setModalProps((oldProps) => {
           isFirstModalRef.current = oldProps.length === 0
+          setIsVisible(true)
           return [
             ...oldProps.filter((it) => !it.skipQueue),
             { ...prop, modalKey: prop.modalKey ?? Date.now().toString() },
@@ -50,7 +51,8 @@ function GlobalModal() {
     const hideSub = DeviceEventEmitter.addListener(HIDE_GLOBAL_MODAL, (key: string) => {
       setModalProps((oldProps) => {
         if (oldProps.length === 1) {
-          lastModalRef.current = oldProps[0]
+          setIsVisible(false)
+          return oldProps
         }
         return oldProps.filter((it) => it.modalKey !== key)
       })
@@ -61,13 +63,12 @@ function GlobalModal() {
     };
   }, []);
 
-  const activeModalProp = modalProps.slice(-1)[0] ?? lastModalRef.current
-  const isVisible = modalProps.length !== 0
 
   const closeModal = () => {
     setModalProps((oldProps) => {
       if (oldProps.length === 1) {
-        lastModalRef.current = oldProps[0]
+        setIsVisible(false)
+        return oldProps
       }
       return oldProps.slice(0, -1)
     });
@@ -75,7 +76,7 @@ function GlobalModal() {
 
   const hideModal = () => {
     setModalVisible(false)
-    lastModalRef.current = undefined
+    setModalProps([])
   }
 
   useEffect(() => {
@@ -107,18 +108,21 @@ function GlobalModal() {
     >
       <Animated.View style={[styles.backdrop, backdropOpacityStyle]}></Animated.View>
       <Animated.View style={[styles.centeredView, containerOpacityStyle]}>
-        <Animated.View style={styles.modalView} layout={Layout.delay(150).duration(250)}>
-          {activeModalProp?.Component && (
-            <Animated.View key={activeModalProp?.modalKey} exiting={FadeOut.duration(150)} entering={isFirstModalRef.current ? undefined : FadeIn.delay(400).duration(250)}>
-              <activeModalProp.Component />
-              {!activeModalProp?.hideClose && <Pressable
+        <Animated.View style={styles.modalView} layout={Layout.duration(250)}>
+          {modalProps.map((it, index) => (
+            <Animated.View style={{
+              position: index === modalProps.length - 1 ? 'relative' : 'absolute',
+              opacity: index === modalProps.length - 1 ? 1 : 0,
+            }} key={it.modalKey} exiting={FadeOut.duration(150)} entering={isFirstModalRef.current ? undefined : FadeIn.delay(150).duration(250)}>
+              <it.Component />
+              {!it?.hideClose && <Pressable
                 style={[styles.button, styles.buttonClose]}
                 onPress={closeModal}>
                 <Text style={styles.textStyle}>Close Modal</Text>
               </Pressable>
               }
             </Animated.View>
-          )}
+          ))}
         </Animated.View>
       </Animated.View>
     </Modal>
@@ -147,6 +151,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 32,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   button: {
     borderRadius: 4,
