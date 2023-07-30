@@ -1,15 +1,17 @@
 import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 import Animated, { Easing, FadeOut, useAnimatedStyle, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
+import { CHILD_ANIM_DURATION, LAYOUT_ANIM_DURATION } from './Constants';
 
 type ChildWrapperProps = {
   isEnabled: boolean,
+  ignoreDelay: boolean,
   hideClose?: boolean,
   onClosePress: () => void,
   children: React.ReactNode,
 }
 
-function ChildWrapper({ isEnabled, hideClose, onClosePress, children }: ChildWrapperProps) {
+function ChildWrapper({ isEnabled, ignoreDelay, hideClose, onClosePress, children }: ChildWrapperProps) {
   const opacityValue = useSharedValue(0)
   const viewStyle = useAnimatedStyle(() => {
     return { opacity: opacityValue.value }
@@ -17,17 +19,17 @@ function ChildWrapper({ isEnabled, hideClose, onClosePress, children }: ChildWra
 
   useEffect(() => {
     if (isEnabled) {
-      opacityValue.value = withDelay(500, withTiming(1, {
-        duration: 250,
+      opacityValue.value = withDelay(ignoreDelay ? 0 : CHILD_ANIM_DURATION + LAYOUT_ANIM_DURATION, withTiming(1, {
+        duration: CHILD_ANIM_DURATION,
         easing: Easing.ease,
       }))
     } else {
       opacityValue.value = withTiming(0, {
-        duration: 250,
+        duration: CHILD_ANIM_DURATION,
         easing: Easing.ease,
       })
     }
-  }, [isEnabled])
+  }, [isEnabled, ignoreDelay])
 
   console.log(`ViewStyle: `, viewStyle);
 
@@ -36,8 +38,6 @@ function ChildWrapper({ isEnabled, hideClose, onClosePress, children }: ChildWra
     <Animated.View
       style={[viewStyle, {
         position: isEnabled ? 'relative' : 'absolute',
-        borderColor: 'red',
-        borderWidth: 1,
         margin: 32,
       }]}
       exiting={FadeOut.duration(250)}

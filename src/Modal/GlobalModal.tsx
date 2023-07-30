@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Modal, Pressable, StyleSheet, Text } from 'react-native';
-import Animated, { Easing, FadeIn, FadeOut, interpolate, Layout, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { DeviceEventEmitter, Modal, StyleSheet } from 'react-native';
+import Animated, { Easing, interpolate, Layout, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ChildWrapper from './ChildWrapper';
+import { CHILD_ANIM_DURATION, LAYOUT_ANIM_DURATION } from './Constants';
 
 const SHOW_GLOBAL_MODAL = 'show_global_modal';
 const HIDE_GLOBAL_MODAL = "hide_global_modal"
@@ -33,7 +34,7 @@ function GlobalModal() {
   const [modalProps, setModalProps] = useState<GlobalModalProps[]>([]);
   const [modalVisible, setModalVisible] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
-  const isFirstModalRef = useRef<boolean>()
+  const isFirstModalRef = useRef<boolean>(false)
 
   useEffect(() => {
     const showSub = DeviceEventEmitter.addListener(
@@ -108,9 +109,9 @@ function GlobalModal() {
     >
       <Animated.View style={[styles.backdrop, backdropOpacityStyle]}></Animated.View>
       <Animated.View style={[styles.centeredView, containerOpacityStyle]}>
-        <Animated.View style={styles.modalView} layout={Layout.delay(250).duration(250)}>
+        <Animated.View style={styles.modalView} layout={Layout.delay(CHILD_ANIM_DURATION).duration(LAYOUT_ANIM_DURATION)}>
           {modalProps.map((it, index) => (
-            <ChildWrapper key={it.modalKey} isEnabled={index === modalProps.length - 1} hideClose={it.hideClose} onClosePress={closeModal}>
+            <ChildWrapper key={it.modalKey} ignoreDelay={isFirstModalRef.current} isEnabled={index === modalProps.length - 1} hideClose={it.hideClose} onClosePress={closeModal}>
               <it.Component />
             </ChildWrapper>
           ))}

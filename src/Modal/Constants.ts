@@ -1,0 +1,2 @@
+export const LAYOUT_ANIM_DURATION = 250
+export const CHILD_ANIM_DURATION = 250
