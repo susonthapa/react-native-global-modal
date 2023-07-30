@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Modal, StyleSheet } from 'react-native';
 import Animated, { Easing, interpolate, Layout, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ChildWrapper from './ChildWrapper';
-import { CHILD_ANIM_DURATION, LAYOUT_ANIM_DURATION } from './Constants';
+import { CHILD_ANIM_DURATION, LAYOUT_ANIM_DURATION, MODAL_ANIM_DURATION } from './Constants';
 
 const SHOW_GLOBAL_MODAL = 'show_global_modal';
 const HIDE_GLOBAL_MODAL = "hide_global_modal"
@@ -85,13 +85,13 @@ function GlobalModal() {
     if (isVisible) {
       setModalVisible(true)
       opacityValue.value = withTiming(1, {
-        duration: 250,
+        duration: MODAL_ANIM_DURATION,
         easing: Easing.ease,
       })
     } else {
       opacityValue.value = withTiming(0, {
-        duration: 300,
-        easing: Easing.linear,
+        duration: MODAL_ANIM_DURATION,
+        easing: Easing.ease,
       }, (finished) => {
         if (finished) {
           runOnJS(hideModal)()
