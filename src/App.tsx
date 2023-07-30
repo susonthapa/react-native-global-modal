@@ -67,6 +67,26 @@ function App(): JSX.Element {
         <Button title='Scrolling Content Modal' onPress={() => showGlobalModal({
           Component: () => <ScrollingContent />,
         })} />
+        <Button title='Show All' onPress={() => {
+          showGlobalModal({
+            Component: NestedModal
+          })
+          setTimeout(() => {
+            showGlobalModal({
+              Component: Progress
+            })
+            setTimeout(() => {
+              showGlobalModal({
+                Component: LongContent
+              })
+              setTimeout(() => {
+                showGlobalModal({
+                  Component: ScrollingContent,
+                })
+              }, 1000)
+            }, 1000)
+          }, 1000)
+        }} />
       </View>
       <GlobalModal />
     </SafeAreaView>

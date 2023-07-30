@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Modal, Pressable, StyleSheet, Text } from 'react-native';
 import Animated, { Easing, FadeIn, FadeOut, interpolate, Layout, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import ChildWrapper from './ChildWrapper';
 
 const SHOW_GLOBAL_MODAL = 'show_global_modal';
 const HIDE_GLOBAL_MODAL = "hide_global_modal"
@@ -95,7 +96,6 @@ function GlobalModal() {
           runOnJS(hideModal)()
         }
       })
-
     }
   }, [isVisible])
 
@@ -108,20 +108,11 @@ function GlobalModal() {
     >
       <Animated.View style={[styles.backdrop, backdropOpacityStyle]}></Animated.View>
       <Animated.View style={[styles.centeredView, containerOpacityStyle]}>
-        <Animated.View style={styles.modalView} layout={Layout.duration(250)}>
+        <Animated.View style={styles.modalView} layout={Layout.delay(250).duration(250)}>
           {modalProps.map((it, index) => (
-            <Animated.View style={{
-              position: index === modalProps.length - 1 ? 'relative' : 'absolute',
-              opacity: index === modalProps.length - 1 ? 1 : 0,
-            }} key={it.modalKey} exiting={FadeOut.duration(150)} entering={isFirstModalRef.current ? undefined : FadeIn.delay(150).duration(250)}>
+            <ChildWrapper key={it.modalKey} isFirst={modalProps.length === 1} isEnabled={index === modalProps.length - 1} hideClose={it.hideClose} onClosePress={closeModal}>
               <it.Component />
-              {!it?.hideClose && <Pressable
-                style={[styles.button, styles.buttonClose]}
-                onPress={closeModal}>
-                <Text style={styles.textStyle}>Close Modal</Text>
-              </Pressable>
-              }
-            </Animated.View>
+            </ChildWrapper>
           ))}
         </Animated.View>
       </Animated.View>
@@ -149,21 +140,9 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
-    padding: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  button: {
-    borderRadius: 4,
-    padding: 10,
-    elevation: 2,
-    marginTop: 16,
   },
   buttonOpen: {
     backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
   },
   textStyle: {
     color: 'white',
