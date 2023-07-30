@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { Easing, FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
+import { Pressable, StyleSheet, Text } from 'react-native';
+import Animated, { Easing, FadeOut, useAnimatedStyle, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
 
 type ChildWrapperProps = {
   isEnabled: boolean,
@@ -41,7 +41,6 @@ function ChildWrapper({ isEnabled, hideClose, onClosePress, children }: ChildWra
         margin: 32,
       }]}
       exiting={FadeOut.duration(250)}
-    // entering={FadeIn.delay(150).duration(250)}
     >
       {children}
       {!hideClose && <Pressable

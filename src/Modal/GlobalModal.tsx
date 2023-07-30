@@ -110,7 +110,7 @@ function GlobalModal() {
       <Animated.View style={[styles.centeredView, containerOpacityStyle]}>
         <Animated.View style={styles.modalView} layout={Layout.delay(250).duration(250)}>
           {modalProps.map((it, index) => (
-            <ChildWrapper key={it.modalKey} isFirst={modalProps.length === 1} isEnabled={index === modalProps.length - 1} hideClose={it.hideClose} onClosePress={closeModal}>
+            <ChildWrapper key={it.modalKey} isEnabled={index === modalProps.length - 1} hideClose={it.hideClose} onClosePress={closeModal}>
               <it.Component />
             </ChildWrapper>
           ))}
