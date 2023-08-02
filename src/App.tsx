@@ -88,7 +88,9 @@ function App(): JSX.Element {
           }, 1000)
         }} />
       </View>
-      <GlobalModal />
+      <View>
+        <GlobalModal />
+      </View>
     </SafeAreaView>
   );
 }
