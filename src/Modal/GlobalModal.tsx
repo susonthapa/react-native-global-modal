@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Modal, StyleSheet } from 'react-native';
-import Animated, { Easing, interpolate, Layout, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, interpolate, Layout, runOnJS, useAnimatedProps, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ChildWrapper from './ChildWrapper';
 import { CHILD_ANIM_DURATION, LAYOUT_ANIM_DURATION, MODAL_ANIM_DURATION } from './Constants';
 
@@ -24,11 +24,16 @@ export function hideGlobalModal(key: string) {
 
 function GlobalModal() {
   const opacityValue = useSharedValue(0)
+  const useAlphaCompositingValue = useSharedValue(false)
   const backdropOpacityStyle = useAnimatedStyle(() => {
     return { opacity: interpolate(opacityValue.value, [0, 1], [0, 0.5]) }
   })
   const containerOpacityStyle = useAnimatedStyle(() => {
     return { opacity: opacityValue.value }
+  })
+
+  const containerAlphaCompositing = useAnimatedProps(() => {
+    return { needsOffscreenAlphaCompositing: useAlphaCompositingValue.value }
   })
 
   const [modalProps, setModalProps] = useState<GlobalModalProps[]>([]);
@@ -53,6 +58,7 @@ function GlobalModal() {
     const hideSub = DeviceEventEmitter.addListener(HIDE_GLOBAL_MODAL, (key: string) => {
       setModalProps((oldProps) => {
         if (oldProps.length === 1) {
+          useAlphaCompositingValue.value = true
           setIsVisible(false)
           return oldProps
         }
@@ -69,6 +75,7 @@ function GlobalModal() {
   const closeModal = () => {
     setModalProps((oldProps) => {
       if (oldProps.length === 1) {
+        useAlphaCompositingValue.value = true
         setIsVisible(false)
         return oldProps
       }
@@ -76,7 +83,7 @@ function GlobalModal() {
     });
   }
 
-  const hideModal = () => {
+  const onModalHide = () => {
     setModalVisible(false)
     setModalProps([])
   }
@@ -94,7 +101,7 @@ function GlobalModal() {
         easing: Easing.ease,
       }, (finished) => {
         if (finished) {
-          runOnJS(hideModal)()
+          runOnJS(onModalHide)()
         }
       })
     }
@@ -107,9 +114,15 @@ function GlobalModal() {
       visible={modalVisible}
       onRequestClose={closeModal}
     >
-      <Animated.View style={[styles.backdrop, backdropOpacityStyle]}></Animated.View>
-      <Animated.View style={[styles.centeredView, containerOpacityStyle]}>
-        <Animated.View style={styles.modalView} layout={Layout.delay(CHILD_ANIM_DURATION).duration(LAYOUT_ANIM_DURATION)}>
+      <Animated.View style={[styles.backdrop, backdropOpacityStyle]} />
+      <Animated.View
+        style={[styles.centeredView, containerOpacityStyle]}
+        animatedProps={containerAlphaCompositing}
+      >
+        <Animated.View
+          style={styles.modalView}
+          layout={Layout.delay(CHILD_ANIM_DURATION).duration(LAYOUT_ANIM_DURATION)}
+        >
           {modalProps.map((it, index) => (
             <ChildWrapper key={it.modalKey} ignoreDelay={isFirstModalRef.current} isEnabled={index === modalProps.length - 1} hideClose={it.hideClose} onClosePress={closeModal}>
               <it.Component />

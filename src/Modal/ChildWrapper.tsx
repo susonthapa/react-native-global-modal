@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, Text } from 'react-native';
 import Animated, { Easing, FadeOut, useAnimatedStyle, useSharedValue, withDelay, withTiming } from "react-native-reanimated";
-import { CHILD_ANIM_DURATION, LAYOUT_ANIM_DURATION } from './Constants';
+import { CHILD_ANIM_DURATION, LAYOUT_ANIM_DURATION, MODAL_ANIM_DURATION } from './Constants';
 
 type ChildWrapperProps = {
   isEnabled: boolean,
@@ -40,12 +40,14 @@ function ChildWrapper({ isEnabled, ignoreDelay, hideClose, onClosePress, childre
         position: isEnabled ? 'relative' : 'absolute',
         margin: 32,
       }]}
-      exiting={FadeOut.duration(250)}
+      exiting={FadeOut.duration(MODAL_ANIM_DURATION)}
+      // needsOffscreenAlphaCompositing
     >
       {children}
       {!hideClose && <Pressable
         style={[styles.button, styles.buttonClose]}
-        onPress={onClosePress}>
+        onPress={onClosePress}
+      >
         <Text style={styles.textStyle}>Close Modal</Text>
       </Pressable>
       }
