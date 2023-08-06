@@ -31,16 +31,13 @@ function ChildWrapper({ isEnabled, ignoreDelay, hideClose, onClosePress, childre
     }
   }, [isEnabled, ignoreDelay])
 
-  console.log(`ViewStyle: `, viewStyle);
-
-
   return (
     <Animated.View
       style={[viewStyle, {
         position: isEnabled ? 'relative' : 'absolute',
         margin: 32,
       }]}
-      exiting={FadeOut.duration(MODAL_ANIM_DURATION)}
+      exiting={ignoreDelay ? undefined : FadeOut.duration(MODAL_ANIM_DURATION)}
       needsOffscreenAlphaCompositing
     >
       {children}

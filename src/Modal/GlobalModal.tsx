@@ -114,7 +114,7 @@ function GlobalModal() {
       >
         <Animated.View
           style={styles.modalView}
-          layout={Layout.delay(CHILD_ANIM_DURATION).duration(LAYOUT_ANIM_DURATION)}
+        layout={Layout.delay(CHILD_ANIM_DURATION).duration(LAYOUT_ANIM_DURATION)}
         >
           {modalProps.map((it, index) => (
             <ChildWrapper key={it.modalKey} ignoreDelay={isFirstModalRef.current} isEnabled={index === modalProps.length - 1} hideClose={it.hideClose} onClosePress={closeModal}>
