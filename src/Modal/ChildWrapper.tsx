@@ -41,7 +41,7 @@ function ChildWrapper({ isEnabled, ignoreDelay, hideClose, onClosePress, childre
         margin: 32,
       }]}
       exiting={FadeOut.duration(MODAL_ANIM_DURATION)}
-      // needsOffscreenAlphaCompositing
+      needsOffscreenAlphaCompositing
     >
       {children}
       {!hideClose && <Pressable
