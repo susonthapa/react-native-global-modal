@@ -39,6 +39,8 @@ function App(): JSX.Element {
         />
         <View style={{
           alignItems: 'center',
+          height: '100%',
+          justifyContent: 'space-evenly',
         }}>
           <Text style={{
             fontSize: 32,
@@ -77,12 +79,19 @@ function App(): JSX.Element {
               })
               setTimeout(() => {
                 showGlobalModal({
-                  Component: LongContent
+                  modalKey: 'confirmation-modal',
+                  Component: () => <Confirmation onCancelPress={() => hideGlobalModal('confirmation-modal')} onYesPress={() => hideGlobalModal('confirmation-modal')} />,
+                  hideClose: true
                 })
                 setTimeout(() => {
                   showGlobalModal({
-                    Component: ScrollingContent,
+                    Component: LongContent
                   })
+                  setTimeout(() => {
+                    showGlobalModal({
+                      Component: ScrollingContent,
+                    })
+                  }, 1000)
                 }, 1000)
               }, 1000)
             }, 1000)
