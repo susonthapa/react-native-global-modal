@@ -7,7 +7,7 @@
 
 import React from 'react';
 import {
-  Button, SafeAreaView, StatusBar, Text,
+  Button, Modal, SafeAreaView, StatusBar, Text,
   useColorScheme,
   View
 } from 'react-native';
