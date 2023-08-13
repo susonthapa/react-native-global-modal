@@ -2,7 +2,7 @@
 A simple implementation of Global Modal using Reanimated.
 
 ## How to use it?
-To use it in your project, copy everything inside the `src/Modal` folder. This project depends on `react-native-reanimated` V3 so make sure you have that setup. 
+To use it in your project, copy everything inside the `src/Modal` folder. This project depends on `react-native-reanimated` V3 so make sure you have that setup. You can find more information about this [here](https://susuthapa19961227.medium.com/global-modal-in-react-native-bff03b8a33).
 
 ## Demo
 ### Android
