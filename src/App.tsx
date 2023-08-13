@@ -15,12 +15,12 @@ import {
 import {
   Colors
 } from 'react-native/Libraries/NewAppScreen';
-import AutomaticModal from './Modal/Examples/AutomaticModal';
-import Confirmation from './Modal/Examples/Confirmation';
-import LongContent from './Modal/Examples/LongContent';
-import NestedModal from './Modal/Examples/NestModal';
-import Progress from './Modal/Examples/Progress';
-import ScrollingContent from './Modal/Examples/ScrollingContent';
+import AutomaticModal from './Examples/AutomaticModal';
+import Confirmation from './Examples/Confirmation';
+import LongContent from './Examples/LongContent';
+import NestedModal from './Examples/NestModal';
+import Progress from './Examples/Progress';
+import ScrollingContent from './Examples/ScrollingContent';
 import GlobalModal, { hideGlobalModal, showGlobalModal } from './Modal/GlobalModal';
 
 function App(): JSX.Element {

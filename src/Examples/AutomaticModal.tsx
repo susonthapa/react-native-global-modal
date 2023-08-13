@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { Text, View } from 'react-native'
-import { showGlobalModal } from "../GlobalModal"
+import { showGlobalModal } from "../Modal/GlobalModal"
 
 const AutomaticModal = () => {
 
