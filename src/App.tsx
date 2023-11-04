@@ -17,6 +17,7 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import AutomaticModal from './Examples/AutomaticModal';
 import Confirmation from './Examples/Confirmation';
+import Expandable from './Examples/Expandable';
 import LongContent from './Examples/LongContent';
 import NestedModal from './Examples/NestModal';
 import Progress from './Examples/Progress';
@@ -68,6 +69,9 @@ function App(): JSX.Element {
           })} />
           <Button title='Scrolling Content Modal' onPress={() => showGlobalModal({
             Component: () => <ScrollingContent />,
+          })} />
+          <Button title='Expandable' onPress={() => showGlobalModal({
+            Component: () => <Expandable />,
           })} />
           <Button title='Show All' onPress={() => {
             showGlobalModal({
