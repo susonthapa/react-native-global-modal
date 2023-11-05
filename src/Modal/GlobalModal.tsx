@@ -11,6 +11,7 @@ export type GlobalModalProps = {
   skipQueue?: boolean;
   modalKey?: string,
   hideClose?: boolean,
+  disableLayoutAnimation?: boolean,
   Component: React.FC
 };
 
@@ -24,15 +25,9 @@ export function hideGlobalModal(key: string) {
 
 const layoutAnimation = new Layout().delay(CHILD_ANIM_DURATION)
   .duration(LAYOUT_ANIM_DURATION)
-  .withCallback((finished) => {
-    'worklet'
-    if (finished) {
-      console.log(`TODO: finishing the animation`);
-      // DeviceEventEmitter.emit('onAnimationFinished')
-    }
-  })
   .build()
 
+// Using duration of 1ms to disable the animation(sort of)
 const disabledLayoutAnimation = new Layout().duration(1).build()
 
 function GlobalModal() {
@@ -81,17 +76,6 @@ function GlobalModal() {
     };
   }, []);
 
-  useEffect(() => {
-    const sub = DeviceEventEmitter.addListener('onAnimationFinished', () => {
-      console.log(`TODO: received Animation Finish Event`);
-      disableAnimation.value = true
-    })
-    return () => {
-      sub.remove()
-    }
-  }, [])
-
-
   const closeModal = () => {
     setModalProps((oldProps) => {
       disableAnimation.value = false
@@ -108,22 +92,8 @@ function GlobalModal() {
     setModalProps([])
   }
 
-  // const onLayoutAnimationFinish = () => {
-  //   prevModalProps.current = modalProps
-  // }
-
   const CustomLayoutAnimation: LayoutAnimationFunction = (values: LayoutAnimationsValues): LayoutAnimation => {
     'worklet'
-    // const layoutAnimation = Layout.delay(disableAnimation.value ? 0 : CHILD_ANIM_DURATION)
-    //   .duration(disableAnimation.value ? 0 : LAYOUT_ANIM_DURATION)
-    //   // .withCallback(() => {
-    //   //   'worklet'
-    //   //   disableAnimation.value = true
-    //   // })
-    //   .build()
-    console.log(`TODO: customLayoutAnimation`, disableAnimation.value);
-
-
     return disableAnimation.value ? disabledLayoutAnimation(values) : layoutAnimation(values)
   }
 
@@ -169,7 +139,7 @@ function GlobalModal() {
               isEnabled={index === modalProps.length - 1}
               hideClose={it.hideClose}
               onClosePress={closeModal}
-              onEnterAnimationFinished={() => disableAnimation.value = true}>
+              onEnterAnimationFinished={() => disableAnimation.value = it.disableLayoutAnimation ?? false}>
               <it.Component />
             </ChildWrapper>
           ))}

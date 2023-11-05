@@ -72,6 +72,7 @@ function App(): JSX.Element {
           })} />
           <Button title='Expandable' onPress={() => showGlobalModal({
             Component: () => <Expandable />,
+            disableLayoutAnimation: true,
           })} />
           <Button title='Show All' onPress={() => {
             showGlobalModal({
