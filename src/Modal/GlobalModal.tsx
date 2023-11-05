@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { DeviceEventEmitter, Modal, StyleSheet } from 'react-native';
-import Animated, { Easing, interpolate, Layout, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, interpolate, Layout, LayoutAnimation, LayoutAnimationFunction, LayoutAnimationsValues, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ChildWrapper from './ChildWrapper';
 import { CHILD_ANIM_DURATION, LAYOUT_ANIM_DURATION, MODAL_ANIM_DURATION } from './Constants';
 
@@ -22,6 +22,19 @@ export function hideGlobalModal(key: string) {
   DeviceEventEmitter.emit(HIDE_GLOBAL_MODAL, key)
 }
 
+const layoutAnimation = new Layout().delay(CHILD_ANIM_DURATION)
+  .duration(LAYOUT_ANIM_DURATION)
+  .withCallback((finished) => {
+    'worklet'
+    if (finished) {
+      console.log(`TODO: finishing the animation`);
+      // DeviceEventEmitter.emit('onAnimationFinished')
+    }
+  })
+  .build()
+
+const disabledLayoutAnimation = new Layout().duration(1).build()
+
 function GlobalModal() {
   const opacityValue = useSharedValue(0)
   const backdropOpacityStyle = useAnimatedStyle(() => {
@@ -32,6 +45,7 @@ function GlobalModal() {
   })
 
   const [modalProps, setModalProps] = useState<GlobalModalProps[]>([]);
+  const disableAnimation = useSharedValue(false)
   const [modalVisible, setModalVisible] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
   const isFirstModalRef = useRef<boolean>(false)
@@ -42,6 +56,7 @@ function GlobalModal() {
       (prop: GlobalModalProps) => {
         setModalProps((oldProps) => {
           isFirstModalRef.current = oldProps.length === 0
+          disableAnimation.value = false
           setIsVisible(true)
           return [
             ...oldProps.filter((it) => !it.skipQueue),
@@ -52,6 +67,7 @@ function GlobalModal() {
     );
     const hideSub = DeviceEventEmitter.addListener(HIDE_GLOBAL_MODAL, (key: string) => {
       setModalProps((oldProps) => {
+        disableAnimation.value = false
         if (oldProps.length === 1) {
           setIsVisible(false)
           return oldProps
@@ -65,9 +81,20 @@ function GlobalModal() {
     };
   }, []);
 
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener('onAnimationFinished', () => {
+      console.log(`TODO: received Animation Finish Event`);
+      disableAnimation.value = true
+    })
+    return () => {
+      sub.remove()
+    }
+  }, [])
+
 
   const closeModal = () => {
     setModalProps((oldProps) => {
+      disableAnimation.value = false
       if (oldProps.length === 1) {
         setIsVisible(false)
         return oldProps
@@ -79,6 +106,25 @@ function GlobalModal() {
   const onModalHide = () => {
     setModalVisible(false)
     setModalProps([])
+  }
+
+  // const onLayoutAnimationFinish = () => {
+  //   prevModalProps.current = modalProps
+  // }
+
+  const CustomLayoutAnimation: LayoutAnimationFunction = (values: LayoutAnimationsValues): LayoutAnimation => {
+    'worklet'
+    // const layoutAnimation = Layout.delay(disableAnimation.value ? 0 : CHILD_ANIM_DURATION)
+    //   .duration(disableAnimation.value ? 0 : LAYOUT_ANIM_DURATION)
+    //   // .withCallback(() => {
+    //   //   'worklet'
+    //   //   disableAnimation.value = true
+    //   // })
+    //   .build()
+    console.log(`TODO: customLayoutAnimation`, disableAnimation.value);
+
+
+    return disableAnimation.value ? disabledLayoutAnimation(values) : layoutAnimation(values)
   }
 
   useEffect(() => {
@@ -114,10 +160,16 @@ function GlobalModal() {
       >
         <Animated.View
           style={styles.modalView}
-        layout={Layout.delay(CHILD_ANIM_DURATION).duration(LAYOUT_ANIM_DURATION)}
+          layout={CustomLayoutAnimation}
         >
           {modalProps.map((it, index) => (
-            <ChildWrapper key={it.modalKey} ignoreDelay={isFirstModalRef.current} isEnabled={index === modalProps.length - 1} hideClose={it.hideClose} onClosePress={closeModal}>
+            <ChildWrapper
+              key={it.modalKey}
+              ignoreDelay={isFirstModalRef.current}
+              isEnabled={index === modalProps.length - 1}
+              hideClose={it.hideClose}
+              onClosePress={closeModal}
+              onEnterAnimationFinished={() => disableAnimation.value = true}>
               <it.Component />
             </ChildWrapper>
           ))}
@@ -147,6 +199,7 @@ const styles = StyleSheet.create({
     margin: 20,
     backgroundColor: 'white',
     borderRadius: 20,
+    overflow: 'hidden',
   },
   buttonOpen: {
     backgroundColor: '#F194FF',

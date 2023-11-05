@@ -95,6 +95,11 @@ function App(): JSX.Element {
                     showGlobalModal({
                       Component: ScrollingContent,
                     })
+                    setTimeout(() => {
+                      showGlobalModal({
+                        Component: Expandable
+                      })
+                    })
                   }, 1000)
                 }, 1000)
               }, 1000)
