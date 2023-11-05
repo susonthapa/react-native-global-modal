@@ -11,7 +11,7 @@ export type GlobalModalProps = {
   skipQueue?: boolean;
   modalKey?: string,
   hideClose?: boolean,
-  disableLayoutAnimation?: boolean,
+  disableLayoutChangeAnimation?: boolean,
   Component: React.FC
 };
 
@@ -30,6 +30,14 @@ const layoutAnimation = new Layout().delay(CHILD_ANIM_DURATION)
 // Using duration of 1ms to disable the animation(sort of)
 const disabledLayoutAnimation = new Layout().duration(1).build()
 
+const noDelayLayoutAnimation = new Layout().duration(LAYOUT_ANIM_DURATION).build()
+
+enum LayoutChangeAnimationType {
+  DISABLED,
+  DEFAULT,
+  NO_DELAY
+}
+
 function GlobalModal() {
   const opacityValue = useSharedValue(0)
   const backdropOpacityStyle = useAnimatedStyle(() => {
@@ -39,8 +47,9 @@ function GlobalModal() {
     return { opacity: opacityValue.value }
   })
 
+
   const [modalProps, setModalProps] = useState<GlobalModalProps[]>([]);
-  const disableAnimation = useSharedValue(false)
+  const layoutAnimationType = useSharedValue<LayoutChangeAnimationType>(LayoutChangeAnimationType.DEFAULT)
   const [modalVisible, setModalVisible] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
   const isFirstModalRef = useRef<boolean>(false)
@@ -51,7 +60,7 @@ function GlobalModal() {
       (prop: GlobalModalProps) => {
         setModalProps((oldProps) => {
           isFirstModalRef.current = oldProps.length === 0
-          disableAnimation.value = false
+          layoutAnimationType.value = LayoutChangeAnimationType.DEFAULT
           setIsVisible(true)
           return [
             ...oldProps.filter((it) => !it.skipQueue),
@@ -62,7 +71,7 @@ function GlobalModal() {
     );
     const hideSub = DeviceEventEmitter.addListener(HIDE_GLOBAL_MODAL, (key: string) => {
       setModalProps((oldProps) => {
-        disableAnimation.value = false
+        layoutAnimationType.value = LayoutChangeAnimationType.DEFAULT
         if (oldProps.length === 1) {
           setIsVisible(false)
           return oldProps
@@ -78,7 +87,7 @@ function GlobalModal() {
 
   const closeModal = () => {
     setModalProps((oldProps) => {
-      disableAnimation.value = false
+      layoutAnimationType.value = LayoutChangeAnimationType.DEFAULT
       if (oldProps.length === 1) {
         setIsVisible(false)
         return oldProps
@@ -94,7 +103,14 @@ function GlobalModal() {
 
   const CustomLayoutAnimation: LayoutAnimationFunction = (values: LayoutAnimationsValues): LayoutAnimation => {
     'worklet'
-    return disableAnimation.value ? disabledLayoutAnimation(values) : layoutAnimation(values)
+    switch(layoutAnimationType.value) {
+      case LayoutChangeAnimationType.DISABLED:
+        return disabledLayoutAnimation(values)
+      case LayoutChangeAnimationType.NO_DELAY:
+        return noDelayLayoutAnimation(values)
+      default:
+        return layoutAnimation(values)
+    }
   }
 
   useEffect(() => {
@@ -139,7 +155,7 @@ function GlobalModal() {
               isEnabled={index === modalProps.length - 1}
               hideClose={it.hideClose}
               onClosePress={closeModal}
-              onEnterAnimationFinished={() => disableAnimation.value = it.disableLayoutAnimation ?? false}>
+              onEnterAnimationFinished={() => layoutAnimationType.value = it.disableLayoutChangeAnimation ? LayoutChangeAnimationType.DISABLED : LayoutChangeAnimationType.NO_DELAY}>
               <it.Component />
             </ChildWrapper>
           ))}

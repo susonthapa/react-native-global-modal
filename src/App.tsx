@@ -7,7 +7,7 @@
 
 import React from 'react';
 import {
-  Button, Modal, SafeAreaView, StatusBar, Text,
+  Button, SafeAreaView, StatusBar, Text,
   useColorScheme,
   View
 } from 'react-native';
@@ -72,7 +72,7 @@ function App(): JSX.Element {
           })} />
           <Button title='Expandable' onPress={() => showGlobalModal({
             Component: () => <Expandable />,
-            disableLayoutAnimation: true,
+            disableLayoutChangeAnimation: true,
           })} />
           <Button title='Show All' onPress={() => {
             showGlobalModal({
