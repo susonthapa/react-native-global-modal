@@ -28,7 +28,7 @@ const layoutAnimation = new Layout().delay(CHILD_ANIM_DURATION)
   .build()
 
 // Using duration of 1ms to disable the animation(sort of)
-const disabledLayoutAnimation = new Layout().duration(1).build()
+const disabledLayoutAnimation = new Layout().duration(-1).build()
 
 const noDelayLayoutAnimation = new Layout().duration(LAYOUT_ANIM_DURATION).build()
 
