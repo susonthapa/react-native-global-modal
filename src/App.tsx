@@ -7,7 +7,7 @@
 
 import React from 'react';
 import {
-  Button, Modal, SafeAreaView, StatusBar, Text,
+  Button, SafeAreaView, StatusBar, Text,
   useColorScheme,
   View
 } from 'react-native';
@@ -17,6 +17,7 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 import AutomaticModal from './Examples/AutomaticModal';
 import Confirmation from './Examples/Confirmation';
+import Expandable from './Examples/Expandable';
 import LongContent from './Examples/LongContent';
 import NestedModal from './Examples/NestModal';
 import Progress from './Examples/Progress';
@@ -69,6 +70,10 @@ function App(): JSX.Element {
           <Button title='Scrolling Content Modal' onPress={() => showGlobalModal({
             Component: () => <ScrollingContent />,
           })} />
+          <Button title='Expandable' onPress={() => showGlobalModal({
+            Component: () => <Expandable />,
+            disableLayoutChangeAnimation: true,
+          })} />
           <Button title='Show All' onPress={() => {
             showGlobalModal({
               Component: NestedModal
@@ -90,6 +95,11 @@ function App(): JSX.Element {
                   setTimeout(() => {
                     showGlobalModal({
                       Component: ScrollingContent,
+                    })
+                    setTimeout(() => {
+                      showGlobalModal({
+                        Component: Expandable
+                      })
                     })
                   }, 1000)
                 }, 1000)
