@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { DeviceEventEmitter, Modal, StyleSheet } from 'react-native';
+import { DeviceEventEmitter, Modal, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import Animated, { Easing, interpolate, Layout, LayoutAnimation, LayoutAnimationFunction, LayoutAnimationsValues, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import ChildWrapper from './ChildWrapper';
 import { CHILD_ANIM_DURATION, LAYOUT_ANIM_DURATION, MODAL_ANIM_DURATION } from './Constants';
@@ -12,7 +12,8 @@ export type GlobalModalProps = {
   modalKey?: string,
   hideClose?: boolean,
   disableLayoutChangeAnimation?: boolean,
-  Component: React.FC
+  Component: React.FC,
+  dismissible?: boolean,
 };
 
 export function showGlobalModal(prop: GlobalModalProps) {
@@ -144,6 +145,11 @@ function GlobalModal() {
         style={[styles.centeredView, containerOpacityStyle]}
         needsOffscreenAlphaCompositing
       >
+        {modalProps.length > 0 && modalProps[modalProps.length - 1].dismissible &&
+          <TouchableWithoutFeedback onPress={closeModal}>
+            <View style={styles.modalOverlay} />
+          </TouchableWithoutFeedback>
+        }
         <Animated.View
           style={styles.modalView}
           layout={CustomLayoutAnimation}
@@ -198,6 +204,13 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 15,
     textAlign: 'center',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0
   },
 });
 
