@@ -76,6 +76,10 @@ function GlobalModal() {
           setIsVisible(false)
           return oldProps
         }
+        if (oldProps.length > 1) {
+          oldProps.shift();
+          setIsVisible(false);
+        }
         return oldProps.filter((it) => it.modalKey !== key)
       })
     })
